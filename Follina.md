@@ -26,7 +26,7 @@ In this intrusion:
 2. likely arrived by the means of [thread-hijacked emails from distribution channels used by TA570](https://isc.sans.edu/diary/TA570+Qakbot+%28Qbot%29+tries+CVE-2022-30190+%28Follina%29+exploit+%28ms-msdt%29/28728).
 3. Weaponized Word document got executed
 1. HTML file was retrieved from a remote server containing a PowerShell payload
-2. Payload contained base64-encoded content => to download Qbot DDLs inside the user's Temp directory
+2. 
 3. Qbot DLL executed via regsvr32.exe
 1. was then injected into legitimate processes (explorer.exe) on the host
 2. Injected process spawned Windows utilities such as `whoami`, `net.exe` and `nslookup` for discovery and to establish connection to the Qbot C2 servers
